@@ -423,7 +423,7 @@
             chatContainer.classList.remove('active');
         });
 
-        // Send message
+        // Send message - Multiple format attempts
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
@@ -438,29 +438,31 @@
             scrollToBottom();
 
             try {
-                console.log('Sending message to:', CONFIG.webhookUrl);
-                console.log('Message:', message);
+                console.log('Attempting to send message:', message);
 
+                // Try POST with JSON body (most common)
                 const response = await fetch(CONFIG.webhookUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'text/plain',
+                        'Content-Type': 'application/json',
                         'Accept': 'application/json',
                     },
-                    body: message
+                    body: JSON.stringify({
+                        action: 'sendMessage',
+                        sessionId: getSessionId(),
+                        chatInput: message
+                    })
                 });
 
                 console.log('Response status:', response.status);
-                console.log('Response ok:', response.ok);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const contentType = response.headers.get('content-type');
-                console.log('Content-Type:', contentType);
-
                 let data;
+                const contentType = response.headers.get('content-type');
+                
                 if (contentType && contentType.includes('application/json')) {
                     data = await response.json();
                 } else {
@@ -471,7 +473,7 @@
                 
                 typingIndicator.classList.remove('active');
 
-                // Extract message from various possible formats
+                // Extract bot message from various possible response formats
                 let botMessage;
                 if (typeof data === 'string') {
                     botMessage = data;
@@ -483,6 +485,8 @@
                     botMessage = data.message;
                 } else if (data.text) {
                     botMessage = data.text;
+                } else if (Array.isArray(data) && data.length > 0) {
+                    botMessage = data[0].output || data[0].message || data[0].text || JSON.stringify(data[0]);
                 } else {
                     botMessage = JSON.stringify(data);
                 }
@@ -490,10 +494,11 @@
                 addMessage(botMessage, 'bot');
 
             } catch (error) {
-                console.error('Full error:', error);
-                console.error('Error message:', error.message);
+                console.error('Error details:', error);
                 typingIndicator.classList.remove('active');
-                addMessage(`Error: ${error.message}. Check browser console for details.`, 'bot');
+                
+                // Show error with details
+                addMessage(`Connection error. Please check if the n8n workflow is active and accessible.`, 'bot');
             } finally {
                 sendButton.disabled = false;
                 chatInput.focus();
