@@ -438,25 +438,33 @@
             scrollToBottom();
 
             try {
+                // n8n Chat format - send as plain text in body with specific headers
                 const response = await fetch(CONFIG.webhookUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain',
+                        'Accept': 'application/json',
                     },
-                    body: JSON.stringify({
-                        chatId: getSessionId(),
-                        message: message,
-                        timestamp: new Date().toISOString()
-                    })
+                    body: message  // Send message as plain text
                 });
+
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
                 const data = await response.json();
                 
                 // Hide typing indicator
                 typingIndicator.classList.remove('active');
 
-                // Add bot response
-                const botMessage = data.output || data.response || data.message || "I'm not sure how to respond to that.";
+                // n8n chat returns different formats - try multiple fields
+                const botMessage = data.output || 
+                                 data.response || 
+                                 data.message || 
+                                 data.text ||
+                                 (typeof data === 'string' ? data : "I'm not sure how to respond to that.");
+                
                 addMessage(botMessage, 'bot');
 
             } catch (error) {
