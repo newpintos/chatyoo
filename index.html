@@ -420,6 +420,10 @@
 
         // Close chat
         closeButton.addEventListener('click', () => {
+            // Send message to parent (Wix) to close the iframe
+            window.parent.postMessage({ action: 'closeChat' }, '*');
+            
+            // Also hide locally if not in iframe
             chatContainer.classList.remove('active');
         });
 
