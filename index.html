@@ -24,11 +24,11 @@
             right: 20px;
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 16px rgba(255, 107, 53, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -39,7 +39,7 @@
 
         #chat-button:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
         }
 
         #chat-button.hidden {
@@ -80,7 +80,7 @@
 
         /* Chat Header */
         #chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
             padding: 20px;
             display: flex;
@@ -145,7 +145,7 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            background: #f8f9fa;
+            background: #f5f5f5;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -193,12 +193,12 @@
         }
 
         .message.bot .message-avatar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
         }
 
         .message.user .message-avatar {
-            background: #e2e8f0;
+            background: #e0e0e0;
         }
 
         .message-content {
@@ -231,26 +231,26 @@
             display: inline-block;
             margin: 8px 4px;
             padding: 8px 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
             text-decoration: none;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 500;
             transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
         }
 
         .message.bot .message-content .link-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 1px 2px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 1px 2px rgba(255, 107, 53, 0.3);
             margin-left: auto;
         }
 
@@ -320,13 +320,13 @@
         }
 
         #chat-input:focus {
-            border-color: #667eea;
+            border-color: #ff6b35;
         }
 
         #send-button {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             border: none;
             border-radius: 50%;
             color: white;
@@ -377,7 +377,7 @@
             <div id="chat-header-content">
                 <div id="chat-avatar">🤖</div>
                 <div id="chat-title">
-                    <h3>AI Assistant</h3>
+                    <h3>XYZ Digilab Assistant</h3>
                     <span>Online now</span>
                 </div>
             </div>
@@ -584,13 +584,19 @@
             // Convert line breaks
             formatted = formatted.replace(/\n/g, '<br>');
             
-            // Find URLs and convert to buttons
+            // Find URLs and convert to buttons with custom text
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             formatted = formatted.replace(urlRegex, function(url) {
                 // Clean URL (remove trailing punctuation)
                 const cleanUrl = url.replace(/[.,;!?]$/, '');
-                const domain = cleanUrl.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
                 
+                // Check if it's a cal.com link
+                if (cleanUrl.includes('cal.com')) {
+                    return `<a href="${cleanUrl}" target="_blank" class="link-button">📅 Book a Call</a>`;
+                }
+                
+                // For other URLs, show domain name
+                const domain = cleanUrl.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
                 return `<a href="${cleanUrl}" target="_blank" class="link-button">${domain}</a>`;
             });
             
