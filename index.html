@@ -218,6 +218,34 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
+        .message.bot .message-content strong {
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .message.bot .message-content em {
+            font-style: italic;
+        }
+
+        .message.bot .message-content .link-button {
+            display: inline-block;
+            margin: 8px 4px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .message.bot .message-content .link-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
         .message.user .message-content {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -527,7 +555,13 @@
             
             const content = document.createElement('div');
             content.className = 'message-content';
-            content.textContent = text;
+            
+            // Format the message (convert markdown to HTML)
+            if (type === 'bot') {
+                content.innerHTML = formatBotMessage(text);
+            } else {
+                content.textContent = text;
+            }
             
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(content);
@@ -535,6 +569,32 @@
             // Insert before typing indicator
             chatMessages.insertBefore(messageDiv, typingIndicator);
             scrollToBottom();
+        }
+
+        // Format bot messages: convert markdown and links to styled HTML
+        function formatBotMessage(text) {
+            let formatted = text;
+            
+            // Convert **bold** to <strong>
+            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert *italic* to <em>
+            formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            
+            // Convert line breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Find URLs and convert to buttons
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            formatted = formatted.replace(urlRegex, function(url) {
+                // Clean URL (remove trailing punctuation)
+                const cleanUrl = url.replace(/[.,;!?]$/, '');
+                const domain = cleanUrl.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+                
+                return `<a href="${cleanUrl}" target="_blank" class="link-button">${domain}</a>`;
+            });
+            
+            return formatted;
         }
 
         // Scroll to bottom
